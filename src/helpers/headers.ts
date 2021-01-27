@@ -1,16 +1,4 @@
-import { isPlainObject } from './util'
-
-function normalizeHeaderName(headers: any, normalizedName: string): void {
-  if (!headers) {
-    return
-  }
-  Object.keys(headers).forEach(name => {
-    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
-      headers[normalizedName] = headers[name]
-      delete headers[name]
-    }
-  })
-}
+import { isPlainObject } from "./util";
 
 export function processHeaders(headers: any, data: any): any {
   normalizeHeaderName(headers, 'Content-Type')
@@ -23,13 +11,24 @@ export function processHeaders(headers: any, data: any): any {
   return headers
 }
 
-export function parseHeaders(headers: string): any {
-  let parsed = Object.create(null)
+// 处理headers参数统一形式
+function normalizeHeaderName(headers: any, normalizedName: string): void {
   if (!headers) {
-    return parsed
+    return
   }
 
-  headers.split('\r\n').forEach(line => {
+  Object.keys(headers).forEach((key) => {
+    if (key !== normalizedName && key.toLowerCase() === normalizedName.toLowerCase()) {
+      headers[normalizedName] = headers[key]
+      delete headers[key]
+    }
+  })
+}
+
+export function parseHeaders(headers: string): any {
+  let parsed = Object.create(null)
+
+  headers.split('\r\n').forEach((line) => {
     let [key, val] = line.split(':')
     key = key.trim().toLowerCase()
     if (!key) {
