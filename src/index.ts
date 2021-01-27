@@ -1,14 +1,14 @@
-import { AxiosRequestConfig } from './types/index'
+import { AxiosRequestConfig, AxiosPromise } from './types/index'
 import xhr from './core/xhr'
 import { buildURL } from './helpers/url'
 import { transformRequest } from './helpers/data'
 import { processHeaders } from './helpers/headers'
 
-export default function axios(config: AxiosRequestConfig): void {
+export default function axios(config: AxiosRequestConfig): AxiosPromise {
   // 处理URL参数
   processConfig(config)
   // 实现XMLHttpRequest对象通讯
-  xhr(config)
+  return xhr(config)
 }
 
 // 处理config参数配置
