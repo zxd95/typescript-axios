@@ -22,6 +22,7 @@ export interface AxiosRequestConfig {
   params?: any
   headers?: any
   responseType?: XMLHttpRequestResponseType // '' | arraybuffer | blob | document | json | text | ms-stream
+  timeout?: number
 }
 
 export interface AxiosResponse {
@@ -34,4 +35,4 @@ export interface AxiosResponse {
 }
 
 // 继承Promise泛型接口
-export interface AxiosPromise extends Promise<AxiosResponse> { }
+export interface AxiosPromise extends Promise<AxiosResponse> {}

@@ -2,13 +2,18 @@ import { AxiosRequestConfig, AxiosResponse, AxiosPromise } from '../types/index'
 import { parseHeaders } from '../helpers/headers'
 
 export default function xhr(config: AxiosRequestConfig): AxiosPromise {
-  return new Promise(resolve => {
-    const { url, method = 'get', data = null, headers = {}, responseType } = config
+  return new Promise((resolve, reject) => {
+    const { url, method = 'get', data = null, headers = {}, responseType, timeout } = config
 
     const request = new XMLHttpRequest()
 
     if (responseType) {
       request.responseType = responseType
+    }
+
+    // 设置请求超时
+    if (timeout) {
+      request.timeout = timeout
     }
 
     // method必须转换为全大写，url不能为空，async开启异步
@@ -19,8 +24,14 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
         return
       }
 
+      // 发生如网络错误、超时错误
+      if (request.status === 0) {
+        return
+      }
+
       const responseHeaders = parseHeaders(request.getAllResponseHeaders())
-      const responseData = responseType && responseType !== 'text' ? request.response : request.responseText
+      const responseData =
+        responseType && responseType !== 'text' ? request.response : request.responseText
       const response: AxiosResponse = {
         data: responseData,
         status: request.status,
@@ -29,11 +40,20 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
         config,
         request
       }
-      resolve(response)
+      handleResponse(response)
     }
 
+    // 捕获错误
+    request.onerror = function handleError() {
+      reject(new Error(`Netword Error`))
+    }
+
+    // 捕获超时
+    request.ontimeout = function handleTimeout() {
+      reject(new Error(`Timeout of ${timeout} ms exceeded`))
+    }
     // 设置请求头
-    Object.keys(headers).forEach((key) => {
+    Object.keys(headers).forEach(key => {
       if (data === null && key.toLowerCase() === 'content-type') {
         delete headers[key]
       } else {
@@ -42,5 +62,13 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
     })
 
     request.send(data)
+
+    function handleResponse(response: AxiosResponse): void {
+      if (request.status >= 200 && request.status < 300) {
+        resolve(response)
+      } else {
+        reject(new Error(`Requset failed with status code ${response.status}`))
+      }
+    }
   })
 }
