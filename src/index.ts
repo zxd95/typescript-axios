@@ -8,7 +8,9 @@ export default function axios(config: AxiosRequestConfig): AxiosPromise {
   // 处理URL参数
   processConfig(config)
   // 实现XMLHttpRequest对象通讯
-  return xhr(config)
+  return xhr(config).then(res => {
+    return transformResponseData(res)
+  })
 }
 
 // 处理config参数配置
