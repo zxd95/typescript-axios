@@ -7,14 +7,11 @@ export class Axios {
   }
 
   get(url: string, config?: AxiosRequestConfig): AxiosPromise {
-    return this.request(Object.assign(config || {}, {
-      url,
-      method: 'get'
-    }))
+    return this._requestMethodWithoutData(url, 'get', config)
   }
 
   delete(url: string, config?: AxiosRequestConfig): AxiosPromise {
-    return this._requestMethodWithoutData(url, 'get', config)
+    return this._requestMethodWithoutData(url, 'delete', config)
   }
 
   head(url: string, config?: AxiosRequestConfig): AxiosPromise {
