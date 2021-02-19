@@ -23,6 +23,7 @@ export interface AxiosRequestConfig {
   headers?: any
   responseType?: XMLHttpRequestResponseType // '' | arraybuffer | blob | document | json | text | ms-stream
   timeout?: number
+  [propName: string]: any // 字符串索引签名
 }
 
 export interface AxiosResponse<T = any> {
@@ -46,6 +47,7 @@ export interface AxiosError extends Error {
 }
 
 export interface Axios {
+  defaluts: AxiosRequestConfig
   interceptors: {
     request: AxiosInterceptorManager<AxiosRequestConfig>
     response: AxiosInterceptorManager<AxiosResponse>
