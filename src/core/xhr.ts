@@ -4,7 +4,15 @@ import { createError } from '../helpers/error'
 
 export default function xhr(config: AxiosRequestConfig): AxiosPromise {
   return new Promise((resolve, reject) => {
-    const { url, method = 'get', data = null, headers = {}, responseType, timeout } = config
+    const {
+      url,
+      method = 'get',
+      data = null,
+      headers = {},
+      responseType,
+      timeout,
+      cancelToken
+    } = config
 
     const request = new XMLHttpRequest()
 
@@ -15,6 +23,13 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
     // 设置请求超时
     if (timeout) {
       request.timeout = timeout
+    }
+
+    if (cancelToken) {
+      cancelToken.promise.then(reason => {
+        request.abort()
+        reject(reason)
+      })
     }
 
     // method必须转换为全大写，url不能为空，async开启异步
@@ -68,7 +83,15 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
       if (request.status >= 200 && request.status < 300) {
         resolve(response)
       } else {
-        reject(createError(`Requset failed with status code ${response.status}`, config, null, request, response))
+        reject(
+          createError(
+            `Requset failed with status code ${response.status}`,
+            config,
+            null,
+            request,
+            response
+          )
+        )
       }
     }
   })
